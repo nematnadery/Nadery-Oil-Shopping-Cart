@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naderi Oil | Fuel Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="container header-inner">
+
+      <a href="#" class="logo">
+        <span class="logo-mark">
+          <img src="pic/logo.png" alt="">
+        </span>
+        <span class="logo-text">Naderi <em>Oil</em></span>
+      </a>
+
+      <!-- Cart button. #cart-count shows the number of items -->
+      <button type="button" class="cart-toggle" id="cart-toggle">
+        <span>Cart</span>
+        <span class="cart-badge" id="cart-count">0</span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-eyebrow">Fuel &amp; Lubricants</span>
+      <h1>Quality fuel,<br><span>delivered to your door.</span></h1>
+      <p>Choose your product and add it to the cart.</p>
+    </div>
+  </section>
+
+  <!-- ===== Products ===== -->
+  <main class="container products-section">
+    <h2 class="section-title">Our Products</h2>
+
+    <!-- JS adds product cards here.
+         Template of one card (3 samples are below so you can see the style; delete them when JS works):
+
+         <article class="product-card">
+           <div class="product-img petrol">  (petrol | diesel | kerosene | oil)
+             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5s6 6.2 6 11a6 6 0 1 1-12 0c0-4.8 6-11 6-11z"/></svg>
+           </div>
+           <div class="product-body">
+             <span class="product-category">Petrol</span>
+             <h3 class="product-name">Petrol 80</h3>
+             <div class="product-price"><strong>62</strong> AFN <span>/ liter</span></div>
+             <button type="button" class="btn-add" data-id="1">Add to cart</button>
+           </div>
+         </article>
+    -->
+    <div class="product-grid" id="product-list">
+
+    </div>
+  </main>
+
+  <!-- ===== Dark overlay behind the cart (JS: add/remove class "show") ===== -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ===== Cart drawer (JS: add/remove class "open") ===== -->
+  <aside class="cart" id="cart">
+
+    <div class="cart-head">
+      <h2>Your Cart</h2>
+      <button type="button" class="cart-close" id="cart-close">✕</button>
+    </div>
+
+    <div class="cart-body">
+
+      <!-- Empty message: add class "hidden" when the cart has items -->
+      <div class="cart-empty" id="cart-empty">
+        <div class="cart-empty-icon">🛒</div>
+        <p>Your cart is empty.</p>
+      </div>
+      <!-- JS adds cart items here.
+           Template of one item (1 sample is below; delete it when JS works):
+
+           <li class="cart-item">
+             <div class="cart-info">
+               <span class="cart-name">Petrol 80</span>
+               <span class="cart-unit">62 AFN / liter</span>
+               <div class="cart-qty">
+                 <button type="button" class="cart-qty-btn cart-minus" data-id="1">−</button>
+                 <span class="cart-qty-value">2</span>
+                 <button type="button" class="cart-qty-btn cart-plus" data-id="1">+</button>
+               </div>
+             </div>
+             <div class="cart-side">
+               <span class="cart-price">124 AFN</span>
+               <button type="button" class="cart-remove" data-id="1">Remove</button>
+             </div>
+           </li>
+      -->
+      <ul class="cart-items" id="cart-items">
+
+      </ul>
+
+    </div>
+
+    <div class="cart-footer">
+      <div class="summary-row">
+        <span>Total</span>
+        <strong><span id="cart-total">0</span> AFN</strong>
+      </div>
+      <button type="button" class="btn-checkout" id="checkout-btn">Place order</button>
+      <button type="button" class="btn-clear" id="clear-cart-btn">Clear cart</button>
+    </div>
+
+  </aside>
+
+  <!-- Short message (e.g. "Added to cart"); JS: add/remove class "show" -->
+  <div class="toast" id="toast">Added to cart ✓</div>
+
+  <script src="main.js"></script>
+</body>
+</html>
