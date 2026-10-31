@@ -10,10 +10,14 @@ let cartTtemsContainer = document.getElementById('cart-items')
 let cartCloseBtn = document.getElementById('cart-close')
 let overlay = document.getElementById('overlay')
 let cartToggleBtn = document.getElementById('cart-toggle')
+let cartCount = document.getElementById('cart-count')
+let toast = document.getElementById('toast')
+let cartEmptyMassage = document.getElementById('cart-empty')
+let clearCrtBtn = document.getElementById('clear-cart-btn')
 
 
 let productBasketArray = []
-
+let toastTimer
 ///// Step one: Create our HTML tempelete////////
 products.forEach(function(item){
     let articalElem = document.createElement('article')
@@ -53,6 +57,7 @@ products.forEach(function(item){
     buttonElem.classList.add('btn-add')
     buttonElem.addEventListener('click', function(){
         addProductToBasketArray(item.id)
+        showToast()
     })
     
 
@@ -112,7 +117,6 @@ function basketProductGenrator (userBasketArray){
 
         let cartQtyValue = document.createElement('span')
         cartQtyValue.classList.add('cart-qty-value')
-        // CHANGED: was a fixed 1, now the real count of this item
         cartQtyValue.innerHTML = item.count
 
         let cartPlusBtn = document.createElement('button')
@@ -125,7 +129,6 @@ function basketProductGenrator (userBasketArray){
 
         let oneCartTotalPrice = document.createElement('span')
         oneCartTotalPrice.classList.add('cart-price')
-        // CHANGED: was item.price * 2 (a fixed number)
         oneCartTotalPrice.innerHTML = item.price * item.count + ' AFN'
 
         let cartRemoveBtn = document.createElement('button')
@@ -142,7 +145,18 @@ function basketProductGenrator (userBasketArray){
 
 function updateCart(){
     basketProductGenrator(productBasketArray)
-    
+    cartCount.textContent = productBasketArray.reduce(function(sum, item){
+        return sum + item.count
+    }, 0)  
+    cartEmptyMassage.classList.toggle('hidden', productBasketArray.length > 0)
+}
+
+function showToast(){
+    toast.classList.add('show')
+    clearTimeout(toastTimer)   // cancel the previous timer, if any
+    toastTimer = setTimeout(function(){
+        toast.classList.remove('show')
+    }, 1000)
 }
 
 cartCloseBtn.addEventListener('click', function(){
@@ -159,4 +173,11 @@ cartToggleBtn.addEventListener('click', function(){
 overlay.addEventListener('click', function(){
     overlay.classList.remove('show')
     cart.classList.remove('open')
+})
+
+
+clearCrtBtn.addEventListener('click', function(){
+    productBasketArray = []
+
+    updateCart()
 })
