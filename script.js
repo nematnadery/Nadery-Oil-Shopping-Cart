@@ -1,3 +1,5 @@
+
+// The count now lives on the copy that goes into the cart, not on the original products.
 let products = [
     {id: 1, name: 'Petrol 92 Premume', price: 90, typeOfMoney: 'AFN', catagory: 'PETROL', img: 'pic/pitrol92.jpg'},
     {id: 2, name: 'Diesel 01 (Russian)', price: 82, typeOfMoney: 'AFN', catagory: 'Diesel', img: 'pic/disel01.jpg'},
@@ -7,18 +9,23 @@ let products = [
 
 let productListContainer = document.getElementById('product-list')
 let cartTtemsContainer = document.getElementById('cart-items')
-let cartCloseBtn = document.getElementById('cart-close')
 let overlay = document.getElementById('overlay')
+let cart = document.getElementById('cart')
+let cartCloseBtn = document.getElementById('cart-close')
 let cartToggleBtn = document.getElementById('cart-toggle')
 let cartCount = document.getElementById('cart-count')
-let toast = document.getElementById('toast')
 let cartEmptyMassage = document.getElementById('cart-empty')
+let toast = document.getElementById('toast')
+let checkoutBtn = document.getElementById('checkout-btn')
 let clearCrtBtn = document.getElementById('clear-cart-btn')
-
+let totalBsketPrice = document.getElementById('cart-total')
 
 let productBasketArray = []
+
+// ADDED: keeps the toast timer so we can cancel it before starting a new one
 let toastTimer
-///// Step one: Create our HTML tempelete////////
+
+
 products.forEach(function(item){
     let articalElem = document.createElement('article')
     articalElem.classList.add('product-card')
@@ -55,11 +62,10 @@ products.forEach(function(item){
     let buttonElem = document.createElement('button')
     buttonElem.innerHTML = 'Add to cart'
     buttonElem.classList.add('btn-add')
-    buttonElem.addEventListener('click', function(){
+    buttonElem.addEventListener('click',function(){
         addProductToBasketArray(item.id)
         showToast()
     })
-    
 
     imgDivElem.append(imgElem)
     productBodyDiveElem.append(spanElem, h3Elem, productPriceElem, buttonElem)
@@ -67,27 +73,37 @@ products.forEach(function(item){
     productListContainer.append(articalElem)
 })
 
-/////////Step Two: Add Product To The User Basket//////////
-
 function addProductToBasketArray(productId){
-    // Look for the product in the cart first
+    // ADDED: look for the product in the cart first
     let existing = productBasketArray.find(function(item){
         return item.id === productId
     })
 
     if (existing) {
-        // if already in the cart, so only increase its count (no duplicate row)
+        // ADDED: already in the cart, so only increase its count (no duplicate row)
         existing.count++
     } else {
         let product = products.find(function(item){
             return item.id === productId
         })
-        
+
         productBasketArray.push({ ...product, count: 1 })
     }
-    updateCart()
 
-    
+    updateCart()
+}
+
+// ADDED: changes the count of one cart item (amount is +1 or -1)
+function changeCount(productId, amount){
+    let item = productBasketArray.find(function(item){
+        return item.id === productId
+    })
+
+    item.count += amount
+    // Never go below 1; the Remove button is for deleting an item
+    if (item.count < 1) item.count = 1
+
+    updateCart()
 }
 
 function basketProductGenrator (userBasketArray){
@@ -113,7 +129,9 @@ function basketProductGenrator (userBasketArray){
         let cartMinusBtn = document.createElement('button')
         cartMinusBtn.className = 'cart-qty-btn cart-minus'
         cartMinusBtn.innerHTML = '-'
-       
+        cartMinusBtn.addEventListener('click', function(){
+            changeCount(item.id, -1)
+        })
 
         let cartQtyValue = document.createElement('span')
         cartQtyValue.classList.add('cart-qty-value')
@@ -122,7 +140,9 @@ function basketProductGenrator (userBasketArray){
         let cartPlusBtn = document.createElement('button')
         cartPlusBtn.className = 'cart-qty-btn cart-plus'
         cartPlusBtn.innerHTML = '+'
-        
+        cartPlusBtn.addEventListener('click', function(){
+            changeCount(item.id, 1)
+        })
 
         let cartSideContainer = document.createElement('div')
         cartSideContainer.classList.add('cart-side')
@@ -134,7 +154,10 @@ function basketProductGenrator (userBasketArray){
         let cartRemoveBtn = document.createElement('button')
         cartRemoveBtn.classList.add('cart-remove')
         cartRemoveBtn.innerHTML = 'Remove'
-    
+        cartRemoveBtn.addEventListener('click', function(){
+            removeProductFromBsaket(item.id)
+        })
+
         cartQtyContainer.append(cartMinusBtn, cartQtyValue, cartPlusBtn)
         cartInfoContainer.append(cartName, cartPrice, cartQtyContainer)
         cartSideContainer.append(oneCartTotalPrice, cartRemoveBtn)
@@ -143,14 +166,41 @@ function basketProductGenrator (userBasketArray){
     })
 }
 
+function removeProductFromBsaket(productId){
+    productBasketArray = productBasketArray.filter(function(item){
+        return item.id !== productId
+    })
+    // updateCart() also refreshes the total, the badge and the empty message.
+    updateCart()
+}
+
+
+function calcTotalBsketPrice (userBasketProduct){
+    let totalPrice = 0;
+    userBasketProduct.forEach(function(item){
+        totalPrice += item.price * item.count
+    })
+
+    totalBsketPrice.innerHTML = totalPrice
+}
+
+// Call it after every change to the cart.
 function updateCart(){
     basketProductGenrator(productBasketArray)
+    calcTotalBsketPrice(productBasketArray)
+
+    // Badge = total quantity of all items (reduce adds up the counts)
     cartCount.textContent = productBasketArray.reduce(function(sum, item){
         return sum + item.count
-    }, 0)  
+    }, 0)
+
+    // toggle(name, condition): adds "hidden" when the condition is false,
+    // so the empty message shows only when the cart is empty
     cartEmptyMassage.classList.toggle('hidden', productBasketArray.length > 0)
 }
 
+
+// Replaces the old setInterval, which repeated forever and stacked up on every click.
 function showToast(){
     toast.classList.add('show')
     clearTimeout(toastTimer)   // cancel the previous timer, if any
@@ -169,15 +219,16 @@ cartToggleBtn.addEventListener('click', function(){
     cart.classList.toggle('open')
 })
 
-//  clicking the dark area behind the cart closes it
+// ADDED: clicking the dark area behind the cart closes it
 overlay.addEventListener('click', function(){
     overlay.classList.remove('show')
     cart.classList.remove('open')
 })
-
 
 clearCrtBtn.addEventListener('click', function(){
     productBasketArray = []
 
     updateCart()
 })
+
+updateCart()
