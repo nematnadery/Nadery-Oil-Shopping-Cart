@@ -8,7 +8,7 @@ let products = [
 
 
 let productListContainer = document.getElementById('product-list')
-let cartTtemsContainer = document.getElementById('cart-items')
+let cartItemsContainer = document.getElementById('cart-items')
 let overlay = document.getElementById('overlay')
 let cart = document.getElementById('cart')
 let cartCloseBtn = document.getElementById('cart-close')
@@ -27,50 +27,21 @@ let toastTimer
 
 
 products.forEach(function(item){
-    let articalElem = document.createElement('article')
-    articalElem.classList.add('product-card')
-
-    let imgDivElem = document.createElement('div')
-    imgDivElem.className = 'product-img petrol'
-
-    let imgElem = document.createElement('img')
-    imgElem.setAttribute('src', item.img)
-    imgElem.setAttribute('alt', item.name)
-
-    let productBodyDiveElem = document.createElement('div')
-    productBodyDiveElem.classList.add('product-body')
-
-    let spanElem = document.createElement('span')
-    spanElem.classList.add('product-category')
-    spanElem.innerHTML = item.catagory
-
-    let h3Elem = document.createElement('h3')
-    h3Elem.classList.add('product-name')
-    h3Elem.innerHTML = item.name
-
-    let productPriceElem = document.createElement('div')
-    productPriceElem.classList.add('product-price')
-    
-    let strongElem = document.createElement('strong')
-    strongElem.textContent = item.price
-    
-    let perLiterElem = document.createElement('span')
-    perLiterElem.textContent = '/ liter'
-    
-    productPriceElem.append(strongElem, ' ' + item.typeOfMoney + ' ', perLiterElem)
-
-    let buttonElem = document.createElement('button')
-    buttonElem.innerHTML = 'Add to cart'
-    buttonElem.classList.add('btn-add')
-    buttonElem.addEventListener('click',function(){
-        addProductToBasketArray(item.id)
-        showToast()
-    })
-
-    imgDivElem.append(imgElem)
-    productBodyDiveElem.append(spanElem, h3Elem, productPriceElem, buttonElem)
-    articalElem.append(imgDivElem, productBodyDiveElem)
-    productListContainer.append(articalElem)
+    productListContainer.insertAdjacentHTML('beforeend', `
+    <article class="product-card">
+        <div class="product-img petrol">
+            <img src="${item.img}" alt="${item.name}">
+        </div>
+        <div class="product-body">
+            <span class="product-category">${item.catagory}</span>
+            <h3 class="product-name">${item.name}</h3>
+            <div class="product-price">
+                <strong>${item.price}</strong> ${item.typeOfMoney} <span>/ liter</span>
+            </div>
+            <button type="button" class="btn-add" onclick="addProductToBasketArray(${item.id}); showToast()">Add to cart</button>
+        </div>
+    </article>
+`)
 })
 
 function addProductToBasketArray(productId){
@@ -107,62 +78,25 @@ function changeCount(productId, amount){
 }
 
 function basketProductGenrator (userBasketArray){
-    cartTtemsContainer.innerHTML = ''
+    cartItemsContainer.innerHTML = ''
     userBasketArray.forEach(function(item){
-        let cartItemContainer = document.createElement('li')
-        cartItemContainer.classList.add('cart-item')
-
-        let cartInfoContainer = document.createElement('div')
-        cartInfoContainer.classList.add('cart-info')
-        
-        let cartName = document.createElement('span')
-        cartName.classList.add('cart-name')
-        cartName.textContent = item.name
-
-        let cartPrice = document.createElement('span')
-        cartPrice.classList.add('cart-unit')
-        cartPrice.textContent = item.price + ' AFN / liter'
-
-        let cartQtyContainer = document.createElement('div')
-        cartQtyContainer.classList.add('cart-qty')
-
-        let cartMinusBtn = document.createElement('button')
-        cartMinusBtn.className = 'cart-qty-btn cart-minus'
-        cartMinusBtn.innerHTML = '-'
-        cartMinusBtn.addEventListener('click', function(){
-            changeCount(item.id, -1)
-        })
-
-        let cartQtyValue = document.createElement('span')
-        cartQtyValue.classList.add('cart-qty-value')
-        cartQtyValue.innerHTML = item.count
-
-        let cartPlusBtn = document.createElement('button')
-        cartPlusBtn.className = 'cart-qty-btn cart-plus'
-        cartPlusBtn.innerHTML = '+'
-        cartPlusBtn.addEventListener('click', function(){
-            changeCount(item.id, 1)
-        })
-
-        let cartSideContainer = document.createElement('div')
-        cartSideContainer.classList.add('cart-side')
-
-        let oneCartTotalPrice = document.createElement('span')
-        oneCartTotalPrice.classList.add('cart-price')
-        oneCartTotalPrice.innerHTML = item.price * item.count + ' AFN'
-
-        let cartRemoveBtn = document.createElement('button')
-        cartRemoveBtn.classList.add('cart-remove')
-        cartRemoveBtn.innerHTML = 'Remove'
-        cartRemoveBtn.addEventListener('click', function(){
-            removeProductFromBsaket(item.id)
-        })
-
-        cartQtyContainer.append(cartMinusBtn, cartQtyValue, cartPlusBtn)
-        cartInfoContainer.append(cartName, cartPrice, cartQtyContainer)
-        cartSideContainer.append(oneCartTotalPrice, cartRemoveBtn)
-        cartItemContainer.append(cartInfoContainer, cartSideContainer)
-        cartTtemsContainer.append(cartItemContainer)
+cartItemsContainer.insertAdjacentHTML('beforeend', `
+    <li class="cart-item">
+        <div class="cart-info">
+            <span class="cart-name">${item.name}</span>
+            <span class="cart-unit">${item.price} AFN / liter</span>
+            <div class="cart-qty">
+                <button type="button" class="cart-qty-btn cart-minus" onclick="changeCount(${item.id}, -1)">-</button>
+                <span class="cart-qty-value">${item.count}</span>
+                <button type="button" class="cart-qty-btn cart-plus" onclick="changeCount(${item.id}, 1)">+</button>
+            </div>
+        </div>
+        <div class="cart-side">
+            <span class="cart-price">${item.price * item.count} AFN</span>
+            <button type="button" class="cart-remove" onclick="removeProductFromBsaket(${item.id})">Remove</button>
+        </div>
+    </li>
+`)
     })
 }
 
